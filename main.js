@@ -167,3 +167,33 @@ function lockPlayer() {
 	player.head.position.y = camera.position.y
 	player.head.position.z = camera.position.z
 }
+
+/*
+player.head.rotation.x = -euler.x
+	player.head.rotation.y = -euler.y
+	player.head.rotation.z = -euler.z
+
+	player.body.rotation.y = -euler.y
+	player.body.rotation.z = -euler.z
+
+	player.lowerBody.rotation.y = -euler.y
+	player.lowerBody.rotation.z = -euler.z
+
+	player.rLeg.rotation.y = -euler.y
+	player.rLeg.rotation.z = -euler.z
+
+	player.lLeg.rotation.y = -euler.y
+	player.lLeg.rotation.z = -euler.z
+
+	player.rForearm.rotation.y = -euler.y
+	player.rForearm.rotation.z = -euler.z
+
+	player.lForearm.rotation.y = -euler.y
+	player.lForearm.rotation.z = -euler.z
+
+	player.rUparm.rotation.y = -euler.y
+	player.rUparm.rotation.z = -euler.z
+
+	player.lUparm.rotation.y = -euler.y
+	player.lUparm.rotation.z = -euler.z
+*/
