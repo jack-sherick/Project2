@@ -17,15 +17,20 @@ document.onkeyup = event => {
 let scene = new THREE.Scene();
 scene.background = new THREE.Color(0xbfd1e5);
 
-let camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 20000);
-camera.position.z = 5;
-camera.position.y = 1.5
+let camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 20000);
+camera.position.z = 5.43;
+camera.position.y = 2;
 
 let clock = new THREE.Clock();
 
 //function for rendering
 function render() {
-	renderer.render(scene, camera);
+	if (keys[40]) {
+		renderer.render(scene, camera2)
+	}
+	else {
+		renderer.render(scene, camera)
+	}
 }
 render();
 
@@ -53,9 +58,9 @@ light.position.set( 0.5, 1, 0.75 );
 scene.add(light);
 
 //player meshes
-let headGeo = new THREE.BoxGeometry(.52, .47, .55);
+let headGeo = new THREE.BoxGeometry(.49, .47, .4);
 let headMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
-let bodyGeo = new THREE.BoxGeometry(.4, .38, .4);
+let bodyGeo = new THREE.BoxGeometry(.45, .38, .4);
 let bodyMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
 let armGeo = new THREE.BoxGeometry(.2, .5, .2);
 let armMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
@@ -64,10 +69,12 @@ let legMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true})
 
 //player object
 let player = {
-	canJump: false,	
+	canJump: true,
+	isJumping: false,	
 	walk: true,
 	sprint: false,
 	health: 100,
+	Vy: 0,
 	head: new THREE.Mesh(headGeo, headMat),
 	body: new THREE.Mesh(bodyGeo, bodyMat),
 	lowerBody: new THREE.Mesh(bodyGeo, bodyMat),
@@ -78,36 +85,12 @@ let player = {
 	rLeg: new THREE.Mesh(legGeo, legMat),
 	lLeg: new THREE.Mesh(legGeo, legMat),
 }
-player.head.position.x = 2;
-player.head.position.y = 1.94;
 
-player.body.position.x = 2;
-player.body.position.y = 1.5;
-
-player.lowerBody.position.x = 2;
-player.lowerBody.position.y = 1.2
-
-player.rUparm.position.x = 1.6;
-player.rUparm.position.y = 1.4;
+//create the player
 player.rUparm.rotateZ(2.5)
-
-player.rForearm.position.x = 1.45;
-player.rForearm.position.y = 1.2;
-player.rForearm.rotateZ(2.5)
-
-player.lUparm.position.x = 2.4;
-player.lUparm.position.y = 1.4;
 player.lUparm.rotateZ(-2.5)
-
-player.lForearm.position.x = 2.55;
-player.lForearm.position.y = 1.2;
+player.rForearm.rotateZ(2.5)
 player.lForearm.rotateZ(-2.5)
-
-player.rLeg.position.x = 1.9
-player.rLeg.position.y = .6
-
-player.lLeg.position.x = 2.1
-player.lLeg.position.y = .6
 
 scene.add(player.head);
 scene.add(player.body);
@@ -118,6 +101,89 @@ scene.add(player.lUparm);
 scene.add(player.lForearm);
 scene.add(player.rLeg)
 scene.add(player.lLeg)
+
+//ties the player model to the movement of the camera
+function lockPlayer() {
+	player.head.position.x = camera.position.x;
+	player.head.position.y = camera.position.y;
+	player.head.position.z = camera.position.z;
+
+	player.body.position.x = camera.position.x;
+	player.body.position.y = player.head.position.y-.47;
+	player.body.position.z = camera.position.z;
+
+	player.lowerBody.position.x = camera.position.x;
+	player.lowerBody.position.y = player.body.position.y-.3;
+	player.lowerBody.position.z = camera.position.z;
+
+	player.rUparm.position.x = player.body.position.x-.35
+	player.rUparm.position.y = player.body.position.y;
+	player.rUparm.position.z = camera.position.z;
+
+	player.rForearm.position.x = player.rUparm.position.x-.15;
+	player.rForearm.position.y = player.rUparm.position.y-.2;
+	player.rForearm.position.z = camera.position.z
+
+	player.lUparm.position.x = player.body.position.x+.35;
+	player.lUparm.position.y = player.body.position.y;
+	player.lUparm.position.z = camera.position.z;
+
+	player.lForearm.position.x = player.lUparm.position.x+.15;
+	player.lForearm.position.y = player.lUparm.position.y-.2;
+	player.lForearm.position.z = camera.position.z
+
+	player.rLeg.position.x = player.lowerBody.position.x-.1;
+	player.rLeg.position.y = player.lowerBody.position.y-.6;
+	player.rLeg.position.z = camera.position.z
+
+	player.lLeg.position.x = player.lowerBody.position.x+.1;
+	player.lLeg.position.y = player.lowerBody.position.y-.6;
+	player.lLeg.position.z = camera.position.z
+
+	player.head.rotation.x = -euler.x
+	player.head.rotation.y = -euler.y
+	player.head.rotation.z = -euler.z
+	player.body.rotation.y = -euler.y
+	player.body.rotation.z = -euler.z
+	player.lowerBody.rotation.y = -euler.y
+	player.lowerBody.rotation.z = -euler.z
+	player.rLeg.rotation.y = -euler.y
+	player.rLeg.rotation.z = -euler.z
+	player.lLeg.rotation.y = -euler.y
+	player.lLeg.rotation.z = -euler.z
+	player.rForearm.rotation.y = -euler.y
+	player.rForearm.rotation.z = -euler.z
+	player.lForearm.rotation.y = -euler.y
+	player.lForearm.rotation.z = -euler.z
+	player.rUparm.rotation.y = -euler.y
+	player.rUparm.rotation.z = -euler.z
+	player.lUparm.rotation.y = -euler.y
+	player.lUparm.rotation.z = -euler.z
+}
+
+//gravity
+function gravity() {
+	if (camera.position.y >= groundVar && !player.isJumping) {
+		player.Vy -= .02;
+		player.canJump = false;
+	}
+	if (camera.position.y <= groundVar) {
+		player.canJump = true;
+		player.Vy = 0;
+		camera.position.y = groundVar;
+	}
+	if (player.isJumping) {
+		player.canJump = false;
+		player.Vy += .02;
+	}
+	if (camera.position.y >= groundVar+1.2) {
+		player.isJumping = false;
+	}
+	camera.position.y += player.Vy;
+}
+
+//variables
+let groundVar = 2;
 
 //animation loop
 function cycle() {
@@ -144,6 +210,9 @@ function cycle() {
 	if (keys[68] && player.walk) {
 		controls.moveRight(.1)
 	}
+	if (keys[32] && player.canJump) {
+		player.isJumping = true;
+	}
 	//whilst sprinting
 	if (keys[87] && player.sprint) {
 		controls.moveForward(.19);
@@ -155,45 +224,13 @@ function cycle() {
 		controls.moveForward(.06);
 	}
 	
-	//lockPlayer();
+	lockPlayer();
 	render();
 	controls.lock();
+	gravity();
+	camera2.position.x = camera.position.x;
+	camera2.position.y = camera.position.y;
+	camera2.position.z = camera.position.z+3;
 	requestAnimationFrame(cycle);
 }
 requestAnimationFrame(cycle);
-
-function lockPlayer() {
-	player.head.position.x = camera.position.x
-	player.head.position.y = camera.position.y
-	player.head.position.z = camera.position.z
-}
-
-/*
-player.head.rotation.x = -euler.x
-	player.head.rotation.y = -euler.y
-	player.head.rotation.z = -euler.z
-
-	player.body.rotation.y = -euler.y
-	player.body.rotation.z = -euler.z
-
-	player.lowerBody.rotation.y = -euler.y
-	player.lowerBody.rotation.z = -euler.z
-
-	player.rLeg.rotation.y = -euler.y
-	player.rLeg.rotation.z = -euler.z
-
-	player.lLeg.rotation.y = -euler.y
-	player.lLeg.rotation.z = -euler.z
-
-	player.rForearm.rotation.y = -euler.y
-	player.rForearm.rotation.z = -euler.z
-
-	player.lForearm.rotation.y = -euler.y
-	player.lForearm.rotation.z = -euler.z
-
-	player.rUparm.rotation.y = -euler.y
-	player.rUparm.rotation.z = -euler.z
-
-	player.lUparm.rotation.y = -euler.y
-	player.lUparm.rotation.z = -euler.z
-*/

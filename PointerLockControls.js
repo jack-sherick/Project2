@@ -3,6 +3,8 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
+ let euler;
+
 THREE.PointerLockControls = function ( camera, domElement ) {
 
 	if ( domElement === undefined ) {
@@ -25,7 +27,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 	var lockEvent = { type: 'lock' };
 	var unlockEvent = { type: 'unlock' };
 
-	var euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
+	euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
 
 	var PI_2 = Math.PI / 2;
 
@@ -71,7 +73,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	function onPointerlockError() {
 
-		//console.error( 'THREE.PointerLockControls: Unable to use Pointer Lock API' );
+		console.error( 'THREE.PointerLockControls: Unable to use Pointer Lock API' );
 
 	}
 
