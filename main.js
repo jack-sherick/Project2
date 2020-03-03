@@ -21,15 +21,18 @@ let camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHei
 camera.position.z = 5.43;
 camera.position.y = 2;
 
+let camera2 = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 20000);
+camera2.position.y = 2;	
+
 let clock = new THREE.Clock();
 
 //function for rendering
 function render() {
-	if (keys[40]) {
-		renderer.render(scene, camera2)
+	if (keys[50]) {
+		renderer.render(scene, camera2);
 	}
 	else {
-		renderer.render(scene, camera)
+		renderer.render(scene, camera);
 	}
 }
 render();
@@ -64,7 +67,7 @@ let bodyGeo = new THREE.BoxGeometry(.45, .38, .4);
 let bodyMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
 let armGeo = new THREE.BoxGeometry(.2, .5, .2);
 let armMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
-let legGeo = new THREE.BoxGeometry(.25, .85, .3)
+let legGeo = new THREE.BoxGeometry(.2, .85, .3)
 let legMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true})
 
 //player object
@@ -132,31 +135,39 @@ function lockPlayer() {
 	player.lForearm.position.y = player.lUparm.position.y-.2;
 	player.lForearm.position.z = camera.position.z
 
-	player.rLeg.position.x = player.lowerBody.position.x-.1;
+	player.rLeg.position.x = player.lowerBody.position.x+.1;
 	player.rLeg.position.y = player.lowerBody.position.y-.6;
-	player.rLeg.position.z = camera.position.z
+	player.rLeg.position.z = player.lowerBody.position.z;
 
-	player.lLeg.position.x = player.lowerBody.position.x+.1;
+	player.lLeg.position.x = player.lowerBody.position.x-.1;
 	player.lLeg.position.y = player.lowerBody.position.y-.6;
-	player.lLeg.position.z = camera.position.z
+	player.lLeg.position.z = player.lowerBody.position.z;
 
 	player.head.rotation.x = -euler.x
 	player.head.rotation.y = -euler.y
 	player.head.rotation.z = -euler.z
+
 	player.body.rotation.y = -euler.y
 	player.body.rotation.z = -euler.z
+
 	player.lowerBody.rotation.y = -euler.y
 	player.lowerBody.rotation.z = -euler.z
+
 	player.rLeg.rotation.y = -euler.y
 	player.rLeg.rotation.z = -euler.z
+
 	player.lLeg.rotation.y = -euler.y
 	player.lLeg.rotation.z = -euler.z
+
 	player.rForearm.rotation.y = -euler.y
 	player.rForearm.rotation.z = -euler.z
+
 	player.lForearm.rotation.y = -euler.y
 	player.lForearm.rotation.z = -euler.z
+
 	player.rUparm.rotation.y = -euler.y
 	player.rUparm.rotation.z = -euler.z
+
 	player.lUparm.rotation.y = -euler.y
 	player.lUparm.rotation.z = -euler.z
 }
@@ -176,7 +187,7 @@ function gravity() {
 		player.canJump = false;
 		player.Vy += .02;
 	}
-	if (camera.position.y >= groundVar+1.2) {
+	if (camera.position.y >= groundVar+1) {
 		player.isJumping = false;
 	}
 	camera.position.y += player.Vy;
@@ -214,23 +225,23 @@ function cycle() {
 		player.isJumping = true;
 	}
 	//whilst sprinting
-	if (keys[87] && player.sprint) {
+	if (keys[87] && player.sprint && player.Vy === 0) {
 		controls.moveForward(.19);
 	}
 	if (keys[65] && player.sprint) {
-		controls.moveForward(-.06);
+		controls.moveRight(-.1);
 	}
 	if (keys[68] && player.sprint) {
-		controls.moveForward(.06);
+		controls.moveRight(.1);
+	}
+	if (keys[83] && player.sprint) {
+		controls.moveForward(-.1);
 	}
 	
 	lockPlayer();
 	render();
 	controls.lock();
 	gravity();
-	camera2.position.x = camera.position.x;
-	camera2.position.y = camera.position.y;
-	camera2.position.z = camera.position.z+3;
 	requestAnimationFrame(cycle);
 }
 requestAnimationFrame(cycle);
