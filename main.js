@@ -119,29 +119,29 @@ function lockPlayer() {
 	player.lowerBody.position.y = player.body.position.y-.3;
 	player.lowerBody.position.z = camera.position.z;
 
-	player.rUparm.position.x = player.body.position.x-.35
-	player.rUparm.position.y = player.body.position.y;
-	player.rUparm.position.z = camera.position.z;
+	player.rUparm.position.x = (.5 * Math.cos(euler.y)) + player.body.position.x;
+	player.rUparm.position.y = player.body.position.y-.1;
+	player.rUparm.position.z = (.3 * Math.sin(euler.y)) + camera.position.z;
 
-	player.rForearm.position.x = player.rUparm.position.x-.15;
+	player.rForearm.position.x = (.15 * Math.cos(euler.y)) + player.rUparm.position.x;
 	player.rForearm.position.y = player.rUparm.position.y-.2;
-	player.rForearm.position.z = camera.position.z
+	player.rForearm.position.z = (.3 * Math.sin(euler.y)) + camera.position.z
 
-	player.lUparm.position.x = player.body.position.x+.35;
-	player.lUparm.position.y = player.body.position.y;
-	player.lUparm.position.z = camera.position.z;
+	player.lUparm.position.x = (-.5 * Math.cos(euler.y)) + player.body.position.x;
+	player.lUparm.position.y = player.body.position.y-.1;
+	player.lUparm.position.z = (-.3 * Math.sin(euler.y)) + camera.position.z;
 
-	player.lForearm.position.x = player.lUparm.position.x+.15;
+	player.lForearm.position.x = (-.15 * Math.cos(euler.y)) + player.lUparm.position.x;
 	player.lForearm.position.y = player.lUparm.position.y-.2;
-	player.lForearm.position.z = camera.position.z
+	player.lForearm.position.z = (-.3 * Math.sin(euler.y)) + camera.position.z
 
-	player.rLeg.position.x = player.lowerBody.position.x+.1;
+	player.rLeg.position.x = (.11 * Math.cos(euler.y)) + player.lowerBody.position.x;
 	player.rLeg.position.y = player.lowerBody.position.y-.6;
-	player.rLeg.position.z = player.lowerBody.position.z;
+	player.rLeg.position.z = (.1 * Math.sin(euler.y)) + player.lowerBody.position.z;
 
-	player.lLeg.position.x = player.lowerBody.position.x-.1;
+	player.lLeg.position.x = (-.11 * Math.cos(euler.y)) + player.lowerBody.position.x;
 	player.lLeg.position.y = player.lowerBody.position.y-.6;
-	player.lLeg.position.z = player.lowerBody.position.z;
+	player.lLeg.position.z = (-.11 * Math.sin(euler.y)) + player.lowerBody.position.z;
 
 	player.head.rotation.x = -euler.x
 	player.head.rotation.y = -euler.y
@@ -160,16 +160,16 @@ function lockPlayer() {
 	player.lLeg.rotation.z = -euler.z
 
 	player.rForearm.rotation.y = -euler.y
-	player.rForearm.rotation.z = -euler.z
+	player.rForearm.rotation.z = -2.5
 
 	player.lForearm.rotation.y = -euler.y
-	player.lForearm.rotation.z = -euler.z
+	player.lForearm.rotation.z = 2.5
 
 	player.rUparm.rotation.y = -euler.y
-	player.rUparm.rotation.z = -euler.z
+	player.rUparm.rotation.z = -2.5
 
 	player.lUparm.rotation.y = -euler.y
-	player.lUparm.rotation.z = -euler.z
+	player.lUparm.rotation.z = 2.5
 }
 
 //gravity
@@ -187,7 +187,7 @@ function gravity() {
 		player.canJump = false;
 		player.Vy += .02;
 	}
-	if (camera.position.y >= groundVar+1) {
+	if (camera.position.y >= groundVar+.9) {
 		player.isJumping = false;
 	}
 	camera.position.y += player.Vy;
