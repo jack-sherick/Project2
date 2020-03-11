@@ -3,6 +3,11 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+//cannon phyics
+let world = new CANNON.World();
+world.gravity.set(0, -20, 0);
+world.broadphase = new CANNON.NaiveBroadphase();
+
 //add keyboard input
 const keys = [];
 document.onkeydown = event => {
@@ -26,13 +31,18 @@ camera2.position.y = 2;
 
 let clock = new THREE.Clock();
 
+//var for camera being used
+activeCamera = 1;
+
 //function for rendering
 function render() {
 	if (keys[50]) {
 		renderer.render(scene, camera2);
+		activeCamera = 2;
 	}
 	else {
 		renderer.render(scene, camera);
+		activeCamera = 1;
 	}
 }
 render();
@@ -48,12 +58,21 @@ var cube = new THREE.Mesh(geometry, material);
 cube.position.y = .5;
 scene.add(cube);
 
-//create and rotate floor
-var geometry = new THREE.PlaneGeometry( 1000, 1000, 1, 1 );
-var material = new THREE.MeshBasicMaterial( { color: 'tan' } );
-var floor = new THREE.Mesh( geometry, material );
-floor.rotateX( - Math.PI / 2 );
-scene.add(floor);
+//create and rotate cannon floor
+let groundShape = new CANNON.Plane();
+let groundBody = new CANNON.Body({mass: 0});
+groundBody.addShape(groundShape);
+groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
+world.add(groundBody);
+
+//THREE floor
+geometry = new THREE.PlaneGeometry(300, 300, 50, 50);
+geometry.rotateX(-Math.PI / 2);
+
+material = new THREE.MeshBasicMaterial({color: "tan"});
+mesh = new THREE.Mesh(geometry, material);
+
+scene.add(mesh);
 
 //create light
 let light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
@@ -67,7 +86,7 @@ let bodyGeo = new THREE.BoxGeometry(.45, .38, .4);
 let bodyMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
 let armGeo = new THREE.BoxGeometry(.2, .5, .2);
 let armMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
-let legGeo = new THREE.BoxGeometry(.2, .85, .3)
+let legGeo = new THREE.BoxGeometry(.2, .425, .3)
 let legMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true})
 
 //player object
@@ -86,7 +105,9 @@ let player = {
 	lUparm: new THREE.Mesh(armGeo, armMat),
 	lForearm: new THREE.Mesh(armGeo, armMat),
 	rLeg: new THREE.Mesh(legGeo, legMat),
+	rLowerLeg: new THREE.Mesh(legGeo, legMat),
 	lLeg: new THREE.Mesh(legGeo, legMat),
+	lLowerLeg: new THREE.Mesh(legGeo, legMat)
 }
 
 //create the player
@@ -103,10 +124,14 @@ scene.add(player.rForearm);
 scene.add(player.lUparm);
 scene.add(player.lForearm);
 scene.add(player.rLeg)
+scene.add(player.rLowerLeg)
 scene.add(player.lLeg)
+scene.add(player.lLowerLeg)
 
 //ties the player model to the movement of the camera
 function lockPlayer() {
+
+	//position
 	player.head.position.x = camera.position.x;
 	player.head.position.y = camera.position.y;
 	player.head.position.z = camera.position.z;
@@ -136,13 +161,22 @@ function lockPlayer() {
 	player.lForearm.position.z = (-.3 * Math.sin(euler.y)) + camera.position.z
 
 	player.rLeg.position.x = (.11 * Math.cos(euler.y)) + player.lowerBody.position.x;
-	player.rLeg.position.y = player.lowerBody.position.y-.6;
+	player.rLeg.position.y = player.lowerBody.position.y-.35;
 	player.rLeg.position.z = (.1 * Math.sin(euler.y)) + player.lowerBody.position.z;
 
+	player.rLowerLeg.position.x = (.11 * Math.cos(euler.y)) + player.lowerBody.position.x;
+	player.rLowerLeg.position.y = player.rLeg.position.y-.3;
+	player.rLowerLeg.position.z = (.1 * Math.sin(euler.y)) + player.lowerBody.position.z;
+
 	player.lLeg.position.x = (-.11 * Math.cos(euler.y)) + player.lowerBody.position.x;
-	player.lLeg.position.y = player.lowerBody.position.y-.6;
+	player.lLeg.position.y = player.lowerBody.position.y-.35;
 	player.lLeg.position.z = (-.11 * Math.sin(euler.y)) + player.lowerBody.position.z;
 
+	player.lLowerLeg.position.x = (-.11 * Math.cos(euler.y)) + player.lowerBody.position.x;
+	player.lLowerLeg.position.y = player.lLeg.position.y-.3;
+	player.lLowerLeg.position.z = (-.11 * Math.sin(euler.y)) + player.lowerBody.position.z;
+
+	//rotation
 	player.head.rotation.x = -euler.x
 	player.head.rotation.y = -euler.y
 	player.head.rotation.z = -euler.z
@@ -156,8 +190,14 @@ function lockPlayer() {
 	player.rLeg.rotation.y = -euler.y
 	player.rLeg.rotation.z = -euler.z
 
+	player.rLowerLeg.rotation.y = -euler.y
+	player.rLowerLeg.rotation.z = -euler.z
+
 	player.lLeg.rotation.y = -euler.y
 	player.lLeg.rotation.z = -euler.z
+
+	player.lLowerLeg.rotation.y = -euler.y
+	player.lLowerLeg.rotation.z = -euler.z
 
 	player.rForearm.rotation.y = -euler.y
 	player.rForearm.rotation.z = -2.5
@@ -199,6 +239,11 @@ let groundVar = 2;
 //animation loop
 function cycle() {
 	
+	//player visiblity in different cameras
+	if (activeCamera === 1) {
+		
+	}
+
 	//sprint
 	if (keys[16]) {
 		player.sprint = true;
@@ -241,7 +286,7 @@ function cycle() {
 	lockPlayer();
 	render();
 	controls.lock();
-	gravity();
+	//gravity();
 	requestAnimationFrame(cycle);
 }
 requestAnimationFrame(cycle);
