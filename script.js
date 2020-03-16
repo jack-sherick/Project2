@@ -1,24 +1,44 @@
+import {FirstPersonControls} from "./jsm/controls/FirstPersonControls.js"
+
+//create scene
 let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+scene.background = new THREE.Color( 0xbfd1e5 );
 
+//create camera
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+//controls
+let controls = new FirstPersonControls(camera, render.domElement);
+
+//create clock
+let clock = new THREE.Clock();
+
+//create world
+var worldWidth = 256, worldDepth = 256,
+worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
+
+//create render
 let renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-let geometry = new THREE.BoxGeometry( 1, 1, 1 );
-let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-let cube = new THREE.Mesh( geometry, material );
-scene.add(cube);
+//center camera
+camera.position.x = 100;
+camera.position.y = 10;
+camera.position.z = 10;
+camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-camera.position.z = 5;
+//lighting
+var ambientLight = new THREE.AmbientLight(0x383838);
+scene.add(ambientLight);
 
+//animation cycle
 let animate = function () {
 	requestAnimationFrame(animate);
 
-	cube.rotation.x += 0.01;
-	cube.rotation.y += 0.01;
+	
 
-	renderer.render( scene, camera );
+	renderer.render(scene, camera);
 };
 
 animate();
