@@ -87,7 +87,50 @@ let bodyMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
 let armGeo = new THREE.BoxGeometry(.2, .5, .2);
 let armMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
 let legGeo = new THREE.BoxGeometry(.2, .425, .3)
-let legMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true})
+let legMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
+
+let headShape = new CANNON.Vec3(.49, .47, .4);
+let bodyShape = new CANNON.Vec3(.45, .38, .4);
+let lowerBodyShape = new CANNON.Vec3(.45, .38, .4);
+let rArmShape = new CANNON.Vec3(.2, .5, .2);
+let lArmShape = new CANNON.Vec3(.2, .5, .2);
+let rForearmShape = new CANNON.Vec3(.2, .5, .2);
+let lForearmShape = new CANNON.Vec3(.2, .5, .2);
+let rLegShape = new CANNON.Vec3(.2, .425, .3)
+let lLegShape = new CANNON.Vec3(.2, .425, .3);
+let rLowerLegShape = new CANNON.Vec3(.2, .425, .3);
+let lLowerLegShape = new CANNON.Vec3(.2, .425, .3);
+
+let headBody = new CANNON.Body({mass: .1});
+let bodyBody = new CANNON.Body({mass: .1});
+let lowerBodyBody = new CANNON.Body({mass: .1});
+let rArmBody = new CANNON.Body({mass: .1});
+let lArmBody = new CANNON.Body({mass: .1});
+let rForearmBody = new CANNON.Body({mass: .1});
+let lForearmBody = new CANNON.Body({mass: .1});
+let rLegBody = new CANNON.Body({mass: .1});
+let lLegBody = new CANNON.Body({mass: .1});
+let rLowerLegBody = new CANNON.Body({mass: .1});
+let lLowerLegBody = new CANNON.Body({mass: .1});
+
+let vector = new CANNON.Vec3(1, 1, 1);
+let boxShape = new CANNON.Box(vector);
+let boxBody = new CANNON.Body({mass: 5});
+let boxGeometry = new THREE.BoxGeometry(vector.x*2,vector.y*2,vector.z*2);
+let boxMesh = new THREE.Mesh(boxGeometry, headMat);
+boxBody.addShape(boxShape);
+
+world.add(boxBody);
+scene.add(boxMesh);
+
+boxBody.position.set(4,1,2);
+boxMesh.position.set(4,1,2);
+
+//physics object
+let physicsMaterial = new CANNON.Material("material");
+let phyiscsContactMaterial = new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, 0, .3);
+
+world.addContactMaterial(phyiscsContactMaterial);
 
 //player object
 let player = {
@@ -135,6 +178,8 @@ function lockPlayer() {
 	player.head.position.x = camera.position.x;
 	player.head.position.y = camera.position.y;
 	player.head.position.z = camera.position.z;
+
+	
 
 	player.body.position.x = camera.position.x;
 	player.body.position.y = player.head.position.y-.47;
