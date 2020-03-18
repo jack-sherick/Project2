@@ -89,7 +89,7 @@ let armMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
 let legGeo = new THREE.BoxGeometry(.2, .425, .3)
 let legMat = new THREE.MeshBasicMaterial({color: 'blue', wireframe: true});
 
-let headShape = new CANNON.Vec3(.49, .47, .4);
+let headShape = new CANNON.Sphere({radius: 4});
 let bodyShape = new CANNON.Vec3(.45, .38, .4);
 let lowerBodyShape = new CANNON.Vec3(.45, .38, .4);
 let rArmShape = new CANNON.Vec3(.2, .5, .2);
@@ -117,7 +117,7 @@ let rLowerLegBody = new CANNON.Body({mass: .1});
 let lLowerLegBody = new CANNON.Body({mass: .1});
 
 //pointerlock controls
-let controls = new THREE.PointerLockControls(camera, headBody);
+let controls = new THREE.PointerLockControls(camera, document.body);
 scene.add(controls.getObject());
 
 //player object
