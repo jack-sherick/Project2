@@ -47,9 +47,9 @@ function render() {
 }
 render();
 
-//pointerlock controls
-let controls = new THREE.PointerLockControls(camera, document.body);
-scene.add(controls.getObject())
+//physics object
+let physicsMaterial = new CANNON.Material("material");
+let phyiscsContactMaterial = new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, 0, .3);
 
 //create cube
 var geometry = new THREE.BoxGeometry();
@@ -76,7 +76,7 @@ scene.add(mesh);
 
 //create light
 let light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
-light.position.set( 0.5, 1, 0.75 );
+light.position.set(0.5, 1, 0.75);
 scene.add(light);
 
 //player meshes
@@ -102,6 +102,9 @@ let rLowerLegShape = new CANNON.Vec3(.2, .425, .3);
 let lLowerLegShape = new CANNON.Vec3(.2, .425, .3);
 
 let headBody = new CANNON.Body({mass: .1});
+headBody.addShape(headShape);
+world.add(headBody);
+
 let bodyBody = new CANNON.Body({mass: .1});
 let lowerBodyBody = new CANNON.Body({mass: .1});
 let rArmBody = new CANNON.Body({mass: .1});
@@ -113,24 +116,9 @@ let lLegBody = new CANNON.Body({mass: .1});
 let rLowerLegBody = new CANNON.Body({mass: .1});
 let lLowerLegBody = new CANNON.Body({mass: .1});
 
-let vector = new CANNON.Vec3(1, 1, 1);
-let boxShape = new CANNON.Box(vector);
-let boxBody = new CANNON.Body({mass: 5});
-let boxGeometry = new THREE.BoxGeometry(vector.x*2,vector.y*2,vector.z*2);
-let boxMesh = new THREE.Mesh(boxGeometry, headMat);
-boxBody.addShape(boxShape);
-
-world.add(boxBody);
-scene.add(boxMesh);
-
-boxBody.position.set(4,1,2);
-boxMesh.position.set(4,1,2);
-
-//physics object
-let physicsMaterial = new CANNON.Material("material");
-let phyiscsContactMaterial = new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, 0, .3);
-
-world.addContactMaterial(phyiscsContactMaterial);
+//pointerlock controls
+let controls = new THREE.PointerLockControls(camera, headBody);
+scene.add(controls.getObject());
 
 //player object
 let player = {
@@ -166,10 +154,10 @@ scene.add(player.rUparm);
 scene.add(player.rForearm);
 scene.add(player.lUparm);
 scene.add(player.lForearm);
-scene.add(player.rLeg)
+scene.add(player.rLeg);
 scene.add(player.rLowerLeg)
-scene.add(player.lLeg)
-scene.add(player.lLowerLeg)
+scene.add(player.lLeg);
+scene.add(player.lLowerLeg);
 
 //ties the player model to the movement of the camera
 function lockPlayer() {
@@ -179,7 +167,9 @@ function lockPlayer() {
 	player.head.position.y = camera.position.y;
 	player.head.position.z = camera.position.z;
 
-	
+	headBody.position.x = camera.position.x;
+	headBody.position.y = camera.position.y;
+	headBody.position.z = camera.position.z;
 
 	player.body.position.x = camera.position.x;
 	player.body.position.y = player.head.position.y-.47;
