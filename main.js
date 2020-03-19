@@ -13,7 +13,6 @@ Errors and Issues:
 //create render
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
 
 //cannon phyics
 let world = new CANNON.World();
@@ -129,8 +128,17 @@ let rLowerLegBody = new CANNON.Body({mass: .1});
 let lLowerLegBody = new CANNON.Body({mass: .1});
 
 //pointerlock controls
-let controls = new THREE.PointerLockControls(camera, document.body);
+var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+
+document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock;
+document.body.requestPointerLock();
+
+let controls = new PointerLockControls(camera, headBody);
 scene.add(controls.getObject());
+
+controls.enabled = true;
+
+document.body.appendChild(renderer.domElement);
 
 //player object
 let player = {
@@ -300,39 +308,12 @@ function cycle() {
 		player.sprint = false;
 		player.walk = true;
 	}
-	//movement - wasd
-	if (keys[87] && player.walk) {
-		controls.moveForward(.045);
-	}
-	if (keys[83] && player.walk) {
-		controls.moveForward(-.045);
-	}
-	if (keys[65] && player.walk) {
-		controls.moveRight(-.045)
-	}
-	if (keys[68] && player.walk) {
-		controls.moveRight(.045)
-	}
-	if (keys[32] && player.canJump) {
-		player.isJumping = true;
-	}
-	//whilst sprinting
-	if (keys[87] && player.sprint && player.Vy === 0) {
-		controls.moveForward(.08);
-	}
-	if (keys[65] && player.sprint) {
-		controls.moveRight(-.045);
-	}
-	if (keys[68] && player.sprint) {
-		controls.moveRight(.045);
-	}
-	if (keys[83] && player.sprint) {
-		controls.moveForward(-.045);
-	}
+	//movement - wasd - currently moves the camera, which inst how this should be
+	
 	
 	lockPlayer();
 	render();
-	controls.lock();
+	//controls.lock();
 	//gravity();	
 }
 
