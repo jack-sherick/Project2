@@ -1,9 +1,13 @@
 /*
-Errors:
+Errors and Issues:
 	- The camera is based around a property represtenting an HTML body, rather than a player object, which makes it akward, since I'd have to make the body follow the camera
-	but still have the body still interact with physics and move the camera - not impossible but hard, inefficient, and most likely not necessary
+	but still have the body still interact with physics and move the camera appropaitely - not impossible but hard, inefficient, and most likely not necessary
 	- The player head mesh (what you actually) is a box and the body (interacts with physics) is a sphere. I want it to be a box, but I don't know how to make the body a box
 	- Once physics works, gravity since the gravity function currently is based on nothing (it's commented, but you can uncomment and it works)
+	- Frame is tied to refresh rate causing wacky speeds for high refresh rate monitors - FIXED
+	- Player is visible in the first person camera
+	- Player is faster whilst moving diaganolly
+	- The PointerLock library seems to have mouse movement tied to framerate, so high refresh monitors will have a high sens
 */
 
 //create render
@@ -44,7 +48,7 @@ activeCamera = 1;
 
 //function for rendering
 function render() {
-	if (keys[50]) {
+	if (keys[50]) { //Num Row 2
 		renderer.render(scene, camera2);
 		activeCamera = 2;
 	}
@@ -255,7 +259,7 @@ function lockPlayer() {
 	player.lUparm.rotation.z = 2.5
 }
 
-//gravity
+//gravity - doesnt interact with physics, to be deprecated
 function gravity() {
 	if (camera.position.y >= groundVar && !player.isJumping) {
 		player.Vy -= .02;
@@ -298,38 +302,38 @@ function cycle() {
 	}
 	//movement - wasd
 	if (keys[87] && player.walk) {
-		controls.moveForward(.08);
+		controls.moveForward(.045);
 	}
 	if (keys[83] && player.walk) {
-		controls.moveForward(-.1);
+		controls.moveForward(-.045);
 	}
 	if (keys[65] && player.walk) {
-		controls.moveRight(-.1)
+		controls.moveRight(-.045)
 	}
 	if (keys[68] && player.walk) {
-		controls.moveRight(.1)
+		controls.moveRight(.045)
 	}
 	if (keys[32] && player.canJump) {
 		player.isJumping = true;
 	}
 	//whilst sprinting
 	if (keys[87] && player.sprint && player.Vy === 0) {
-		controls.moveForward(.19);
+		controls.moveForward(.08);
 	}
 	if (keys[65] && player.sprint) {
-		controls.moveRight(-.1);
+		controls.moveRight(-.045);
 	}
 	if (keys[68] && player.sprint) {
-		controls.moveRight(.1);
+		controls.moveRight(.045);
 	}
 	if (keys[83] && player.sprint) {
-		controls.moveForward(-.1);
+		controls.moveForward(-.045);
 	}
 	
 	lockPlayer();
 	render();
 	controls.lock();
-	//gravity();
-	requestAnimationFrame(cycle);
+	//gravity();	
 }
-requestAnimationFrame(cycle);
+
+setInterval(cycle, 1000/144);
