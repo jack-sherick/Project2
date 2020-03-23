@@ -1,9 +1,10 @@
 /*
 Errors and Issues:
 	- The camera is based around a property represtenting an HTML body, rather than a player object, which makes it akward, since I'd have to make the body follow the camera
-	but still have the body still interact with physics and move the camera appropaitely - not impossible but hard, inefficient, and most likely not necessary
+	but still have the body still interact with physics and move the camera appropaitely - not impossible but hard, inefficient, and most likely not necessary - DEPRECATED
+	- The camera acts like OrbitControls for no reason, and the pointer doesn't lock like requested
 	- The player head mesh (what you actually) is a box and the body (interacts with physics) is a sphere. I want it to be a box, but I don't know how to make the body a box
-	- Once physics works, gravity since the gravity function currently is based on nothing (it's commented, but you can uncomment and it works)
+	- Once physics works, gravity, since the current gravity function currently is based on nothing (it's commented, but you can uncomment and it works)
 	- Frame is tied to refresh rate causing wacky speeds for high refresh rate monitors - FIXED
 	- Player is visible in the first person camera
 	- Player is faster whilst moving diaganolly
@@ -11,13 +12,15 @@ Errors and Issues:
 */
 
 //create render
-let renderer = new THREE.WebGLRenderer();
+let renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-//cannon phyics
+//cannon world
 let world = new CANNON.World();
 world.gravity.set(0, -20, 0);
 world.broadphase = new CANNON.NaiveBroadphase();
+world.quatNormalizeSkip = 0;
+world.quatNormalizeFast = false;
 
 //add keyboard input
 const keys = [];
@@ -42,21 +45,7 @@ camera2.position.y = 2;
 
 let clock = new THREE.Clock();
 
-//var for camera being used
-activeCamera = 1;
-
-//function for rendering
-function render() {
-	if (keys[50]) { //Num Row 2
-		renderer.render(scene, camera2);
-		activeCamera = 2;
-	}
-	else {
-		renderer.render(scene, camera);
-		activeCamera = 1;
-	}
-}
-render();
+let controls,time = Date.now();
 
 //physics object
 let physicsMaterial = new CANNON.Material("material");
@@ -127,18 +116,106 @@ let lLegBody = new CANNON.Body({mass: .1});
 let rLowerLegBody = new CANNON.Body({mass: .1});
 let lLowerLegBody = new CANNON.Body({mass: .1});
 
-//pointerlock controls
+//lock pointer
 var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 
-document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock;
-document.body.requestPointerLock();
+var blocker = document.getElementById( 'blocker' );
+var instructions = document.getElementById( 'instructions' );
+var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 
-let controls = new PointerLockControls(camera, headBody);
+if ( havePointerLock ) {
+
+var element = document.body;
+
+var pointerlockchange = function ( event ) {
+
+if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+
+    controls.enabled = true;
+
+    blocker.style.display = 'none';
+
+} else {
+
+    controls.enabled = false;
+
+    blocker.style.display = '-webkit-box';
+    blocker.style.display = '-moz-box';
+    blocker.style.display = 'box';
+
+    instructions.style.display = '';
+
+}
+
+}
+
+    var pointerlockerror = function ( event ) {
+   instructions.style.display = ''; 
+}
+
+	// Hook pointer lock state change events
+    document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+    document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+    document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+
+    document.addEventListener( 'pointerlockerror', pointerlockerror, false );
+    document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
+    document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+
+    instructions.addEventListener( 'click', function ( event ) {
+    instructions.style.display = 'none';
+
+    // Ask the browser to lock the pointer
+    element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+
+    if ( /Firefox/i.test( navigator.userAgent ) ) {
+
+		var fullscreenchange = function ( event ) {
+
+    if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
+
+    	document.removeEventListener( 'fullscreenchange', fullscreenchange );
+        document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
+
+        element.requestPointerLock();
+	}
+}
+
+    document.addEventListener( 'fullscreenchange', fullscreenchange, false );
+     document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
+
+     element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
+
+       element.requestFullscreen();
+
+} else {
+
+    element.requestPointerLock();
+
+}
+}, false );
+
+} else {
+
+    instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+
+}
+
+//pointerlock controls
+controls = new PointerLockControls(camera, headBody);
 scene.add(controls.getObject());
 
 controls.enabled = true;
 
 document.body.appendChild(renderer.domElement);
+
+//function for rendering
+function render() {
+	controls.update( Date.now() - time );
+	renderer.render(scene, camera);
+	time = Date.now();
+}
+render();
 
 //player object
 let player = {
@@ -294,24 +371,8 @@ let groundVar = 2;
 //animation loop
 function cycle() {
 	
-	//player visiblity in different cameras
-	if (activeCamera === 1) {
-		
-	}
-
-	//sprint
-	if (keys[16]) {
-		player.sprint = true;
-		player.walk = false;
-	}
-	if (!keys[16]) {
-		player.sprint = false;
-		player.walk = true;
-	}
-	//movement - wasd - currently moves the camera, which inst how this should be
 	
-	
-	lockPlayer();
+	//lockPlayer();
 	render();
 	//controls.lock();
 	//gravity();	
