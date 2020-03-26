@@ -118,17 +118,15 @@ let rLowerLegBody = new CANNON.Body({mass: .1});
 let lLowerLegBody = new CANNON.Body({mass: .1});
 
 //lock pointer
-var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
-
-var blocker = document.getElementById( 'blocker' );
-var instructions = document.getElementById( 'instructions' );
-var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+let blocker = document.getElementById( 'blocker' );
+let instructions = document.getElementById( 'instructions' );
+let havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 
 if ( havePointerLock ) {
 
-var element = document.body;
+let element = document.body;
 
-var pointerlockchange = function ( event ) {
+let pointerlockchange = function ( event ) {
 
 if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
 
@@ -373,7 +371,7 @@ let groundVar = 2;
 function cycle() {
 	
 	
-	//lockPlayer();
+	lockPlayer();
 	render();
 	//controls.lock();
 	//gravity();	
