@@ -2,7 +2,8 @@
 Errors and Issues:
 	- The camera is based around a property represtenting an HTML body, rather than a player object, which makes it akward, since I'd have to make the body follow the camera
 	but still have the body still interact with physics and move the camera appropaitely - not impossible but hard, inefficient, and most likely not necessary - DEPRECATED
-	- The camera acts like OrbitControls for no reason, and the pointer doesn't lock like requested
+	- The pointer doesn't lock properly - FIXED
+	- The camera acts like OrbitControls for no reason, and the pointer doesn't lock like requested - IN PROGRESS
 	- The player head mesh (what you actually) is a box and the body (interacts with physics) is a sphere. I want it to be a box, but I don't know how to make the body a box
 	- Once physics works, gravity, since the current gravity function currently is based on nothing (it's commented, but you can uncomment and it works)
 	- Frame is tied to refresh rate causing wacky speeds for high refresh rate monitors - FIXED
